@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/filipegms5/MoneyFlow-Backend/controllers"
+	"github.com/filipegms5/MoneyFlow-Backend/middlewares"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -13,8 +14,18 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	formaPagamentoController := controllers.NewFormaPagamentoController(db)
 	transacaoController := controllers.NewTransacaoController(db)
 	dadosCompraController := controllers.NewDadosCompraController(db)
+	usuarioController := controllers.NewUsuarioController(db)
 
-	estabelecimentoRoutes := router.Group("/estabelecimentos")
+	//Rotas Publicas
+	router.POST("/login", usuarioController.Login)
+	router.POST("/signup", usuarioController.Create)
+
+	//Rotas Protegidas
+	auth := middlewares.AuthMiddleware()
+	protected := router.Group("/")
+
+	protected.Use(auth)
+	estabelecimentoRoutes := protected.Group("/estabelecimentos")
 	{
 		estabelecimentoRoutes.POST("", estabelecimentoController.Create)
 		estabelecimentoRoutes.GET("", estabelecimentoController.GetAll)
@@ -23,7 +34,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		estabelecimentoRoutes.DELETE("/:id", estabelecimentoController.Delete)
 	}
 
-	formaPagamentoRoutes := router.Group("/formas-pagamento")
+	formaPagamentoRoutes := protected.Group("/formas-pagamento")
 	{
 		formaPagamentoRoutes.POST("", formaPagamentoController.Create)
 		formaPagamentoRoutes.GET("", formaPagamentoController.GetAll)
@@ -32,7 +43,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		formaPagamentoRoutes.DELETE("/:id", formaPagamentoController.Delete)
 	}
 
-	transacaoRoutes := router.Group("/transacoes")
+	transacaoRoutes := protected.Group("/transacoes")
 	{
 		transacaoRoutes.POST("", transacaoController.Create)
 		transacaoRoutes.GET("", transacaoController.GetAll)
@@ -41,7 +52,13 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		transacaoRoutes.DELETE("/:id", transacaoController.Delete)
 	}
 
-	scanRoutes := router.Group("/scan")
+	usuarioRoutes := protected.Group("/usuarios")
+	{
+		usuarioRoutes.PUT("/:id", controllers.NewUsuarioController(db).Update)
+		usuarioRoutes.DELETE("/:id", controllers.NewUsuarioController(db).Delete)
+	}
+
+	scanRoutes := protected.Group("/scan")
 	{
 		scanRoutes.POST("", dadosCompraController.FetchDadosCompra)
 	}
