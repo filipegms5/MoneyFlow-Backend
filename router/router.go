@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/filipegms5/MoneyFlow-Backend/controllers"
 	"github.com/filipegms5/MoneyFlow-Backend/middlewares"
+	"github.com/filipegms5/MoneyFlow-Backend/services"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -15,6 +16,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	transacaoController := controllers.NewTransacaoController(db)
 	dadosCompraController := controllers.NewDadosCompraController(db)
 	usuarioController := controllers.NewUsuarioController(db)
+	services.InitUsuarioService(db)
 
 	//Rotas Publicas
 	router.POST("/login", usuarioController.Login)
@@ -22,7 +24,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	//Rotas Protegidas
 	auth := middlewares.AuthMiddleware()
-	protected := router.Group("/")
+	protected := router.Group("")
 
 	protected.Use(auth)
 	estabelecimentoRoutes := protected.Group("/estabelecimentos")

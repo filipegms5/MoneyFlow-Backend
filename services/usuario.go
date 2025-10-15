@@ -14,6 +14,7 @@ var tokenBlacklistRepo *repositories.TokenBlacklistRepository
 
 func InitUsuarioService(db *gorm.DB) {
 	usuarioRepository = repositories.NewUsuarioRepository(db)
+	tokenBlacklistRepo = repositories.NewTokenBlacklistRepository(0)
 }
 
 func Login(email, senha string) (string, error) {
