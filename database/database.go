@@ -7,5 +7,5 @@ import (
 )
 
 func SetupDatabase(db *gorm.DB) {
-	db.AutoMigrate(&models.Estabelecimento{}, &models.FormaPagamento{}, &models.Transacao{}, &models.Usuario{})
+	db.AutoMigrate(&models.Estabelecimento{}, &models.FormaPagamento{}, &models.Transacao{}, &models.Usuario{}, &models.MetaFinanceira{})
 }

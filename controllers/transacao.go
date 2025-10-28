@@ -6,6 +6,7 @@ import (
 
 	"github.com/filipegms5/MoneyFlow-Backend/models"
 	"github.com/filipegms5/MoneyFlow-Backend/repositories"
+	"github.com/filipegms5/MoneyFlow-Backend/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -24,6 +25,15 @@ func (c *TransacaoController) Create(ctx *gin.Context) {
 	var transacao models.Transacao
 	if err := ctx.ShouldBindJSON(&transacao); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Attach authenticated user to the transacao
+	if uid, ok := utils.GetUserIDFromContext(ctx); ok {
+		transacao.UsuarioID = uid
+		transacao.Usuario = nil
+	} else {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
 		return
 	}
 
@@ -134,4 +144,39 @@ func (c *TransacaoController) GetByTipo(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, transacoes)
 
+}
+
+func (c *TransacaoController) GetByPeriodo(ctx *gin.Context) {
+	start := ctx.Query("start")
+	end := ctx.Query("end")
+	if start == "" || end == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "start and end are required (ISO strings)"})
+		return
+	}
+	// Only return transactions for the authenticated user
+	uid, ok := utils.GetUserIDFromContext(ctx)
+	if !ok || uid == 0 {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
+	}
+	transacoes, err := c.repo.GetByPeriodoAndUsuarioID(start, end, uid)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, transacoes)
+}
+
+func (c *TransacaoController) GetByUserID(ctx *gin.Context) {
+	uid, ok := utils.GetUserIDFromContext(ctx)
+	if !ok || uid == 0 {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
+	}
+	transacoes, err := c.repo.GetByUsuarioID(uid)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, transacoes)
 }

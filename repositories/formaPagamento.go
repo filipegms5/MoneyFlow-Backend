@@ -48,3 +48,9 @@ func (r *FormaPagamentoRepository) GetByNome(nome string) (*models.FormaPagament
 	}
 	return &formaPagamento, nil
 }
+
+func (r *FormaPagamentoRepository) GetFirst(limit int) ([]models.FormaPagamento, error) {
+	var formasPagamento []models.FormaPagamento
+	err := r.db.Order("id ASC").Limit(limit).Find(&formasPagamento).Error
+	return formasPagamento, err
+}

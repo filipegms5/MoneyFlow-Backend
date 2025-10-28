@@ -5,6 +5,7 @@ import (
 
 	"github.com/filipegms5/MoneyFlow-Backend/repositories"
 	"github.com/filipegms5/MoneyFlow-Backend/services"
+	"github.com/filipegms5/MoneyFlow-Backend/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -83,6 +84,14 @@ func (c *DadosCompraController) FetchDadosCompra(ctx *gin.Context) {
 
 		dadosCompra.FormaPagamentoID = dadosCompra.FormaPagamento.ID
 		dadosCompra.FormaPagamento = nil
+	}
+
+	// Attach authenticated user to the transacao
+	if uid, ok := utils.GetUserIDFromContext(ctx); ok {
+		dadosCompra.UsuarioID = uid
+	} else {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
 	}
 
 	err = c.transacaoRepo.Create(&dadosCompra)

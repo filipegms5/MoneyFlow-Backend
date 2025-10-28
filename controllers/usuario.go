@@ -8,6 +8,7 @@ import (
 	"github.com/filipegms5/MoneyFlow-Backend/models"
 	"github.com/filipegms5/MoneyFlow-Backend/repositories"
 	"github.com/filipegms5/MoneyFlow-Backend/services"
+	"github.com/filipegms5/MoneyFlow-Backend/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -111,4 +112,12 @@ func (ctrl *UsuarioController) Logout(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusOK)
+}
+
+func (ctrl *UsuarioController) GetUserID(c *gin.Context) {
+	if uid, ok := utils.GetUserIDFromContext(c); ok {
+		c.JSON(http.StatusOK, gin.H{"user_id": uid})
+		return
+	}
+	c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
 }

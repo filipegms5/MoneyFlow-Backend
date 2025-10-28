@@ -34,7 +34,7 @@ func (r *TransacaoRepository) GetByID(id uint) (*models.Transacao, error) {
 
 func (r *TransacaoRepository) GetAll() ([]models.Transacao, error) {
 	var transacoes []models.Transacao
-	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Find(&transacoes).Error; err != nil {
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).Find(&transacoes).Error; err != nil {
 		return nil, err
 	}
 	return transacoes, nil
@@ -62,5 +62,31 @@ func (r *TransacaoRepository) GetByTipo(tipo string) ([]models.Transacao, error)
 		return nil, err
 	}
 
+	return transacoes, nil
+}
+
+func (r *TransacaoRepository) GetByUsuarioID(usuarioID uint) ([]models.Transacao, error) {
+	var transacoes []models.Transacao
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).Where("usuario_id = ?", usuarioID).Find(&transacoes).Error; err != nil {
+		return nil, err
+	}
+	return transacoes, nil
+}
+
+func (r *TransacaoRepository) GetByPeriodo(startISO, endISO string) ([]models.Transacao, error) {
+	var transacoes []models.Transacao
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).
+		Where("data BETWEEN ? AND ?", startISO, endISO).Find(&transacoes).Error; err != nil {
+		return nil, err
+	}
+	return transacoes, nil
+}
+
+func (r *TransacaoRepository) GetByPeriodoAndUsuarioID(startISO, endISO string, usuarioID uint) ([]models.Transacao, error) {
+	var transacoes []models.Transacao
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).
+		Where("usuario_id = ? AND data BETWEEN ? AND ?", usuarioID, startISO, endISO).Find(&transacoes).Error; err != nil {
+		return nil, err
+	}
 	return transacoes, nil
 }

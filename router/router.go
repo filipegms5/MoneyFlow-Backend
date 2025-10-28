@@ -17,6 +17,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	dadosCompraController := controllers.NewDadosCompraController(db)
 	usuarioController := controllers.NewUsuarioController(db)
 	services.InitUsuarioService(db)
+	metaFinanceiraController := controllers.NewMetaFinanceiraController(db)
 
 	//Rotas Publicas
 	router.POST("/login", usuarioController.Login)
@@ -40,6 +41,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	{
 		formaPagamentoRoutes.POST("", formaPagamentoController.Create)
 		formaPagamentoRoutes.GET("", formaPagamentoController.GetAll)
+		formaPagamentoRoutes.GET("/qtd/:qtd", formaPagamentoController.GetFirstQtd)
 		formaPagamentoRoutes.GET("/:id", formaPagamentoController.GetByID)
 		formaPagamentoRoutes.PUT("/:id", formaPagamentoController.Update)
 		formaPagamentoRoutes.DELETE("/:id", formaPagamentoController.Delete)
@@ -49,6 +51,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	{
 		transacaoRoutes.POST("", transacaoController.Create)
 		transacaoRoutes.GET("", transacaoController.GetAll)
+		transacaoRoutes.GET("/usuario", transacaoController.GetByUserID)
+		transacaoRoutes.GET("/periodo", transacaoController.GetByPeriodo)
 		transacaoRoutes.GET("/:id", transacaoController.GetByID)
 		transacaoRoutes.GET("/tipo/:tipo", transacaoController.GetByTipo)
 		transacaoRoutes.PUT("/:id", transacaoController.Update)
@@ -57,6 +61,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	usuarioRoutes := protected.Group("/usuarios")
 	{
+		usuarioRoutes.GET("/usuario", usuarioController.GetUserID)
 		usuarioRoutes.PUT("/:id", usuarioController.Update)
 		usuarioRoutes.DELETE("/:id", usuarioController.Delete)
 	}
@@ -64,6 +69,17 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	scanRoutes := protected.Group("/scan")
 	{
 		scanRoutes.POST("", dadosCompraController.FetchDadosCompra)
+	}
+
+	metaRoutes := protected.Group("/metas-financeiras")
+	{
+		metaRoutes.POST("", metaFinanceiraController.Create)
+		metaRoutes.GET("", metaFinanceiraController.GetAll)
+		metaRoutes.GET("/usuario", metaFinanceiraController.GetByUser)
+		metaRoutes.GET("/:id", metaFinanceiraController.GetByID)
+		metaRoutes.GET("/:id/transacoes", metaFinanceiraController.GetTransacoesPeriodo)
+		metaRoutes.PUT("/:id", metaFinanceiraController.Update)
+		metaRoutes.DELETE("/:id", metaFinanceiraController.Delete)
 	}
 
 	return router
