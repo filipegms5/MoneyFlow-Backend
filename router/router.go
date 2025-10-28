@@ -52,6 +52,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		transacaoRoutes.POST("", transacaoController.Create)
 		transacaoRoutes.GET("", transacaoController.GetAll)
 		transacaoRoutes.GET("/usuario", transacaoController.GetByUserID)
+		transacaoRoutes.GET("/qtd/:qtd", transacaoController.GetRecent)
 		transacaoRoutes.GET("/periodo", transacaoController.GetByPeriodo)
 		transacaoRoutes.GET("/:id", transacaoController.GetByID)
 		transacaoRoutes.GET("/tipo/:tipo", transacaoController.GetByTipo)

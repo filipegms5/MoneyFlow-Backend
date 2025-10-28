@@ -99,3 +99,12 @@ func (r *TransacaoRepository) GetByPeriodoAndUsuarioIDComRecorrentes(startISO, e
 	}
 	return transacoes, nil
 }
+
+func (r *TransacaoRepository) GetRecentByUsuarioID(limit int, usuarioID uint) ([]models.Transacao, error) {
+	var transacoes []models.Transacao
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).
+		Where("usuario_id = ?", usuarioID).Order("data DESC").Limit(limit).Find(&transacoes).Error; err != nil {
+		return nil, err
+	}
+	return transacoes, nil
+}

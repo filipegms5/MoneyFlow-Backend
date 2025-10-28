@@ -180,3 +180,26 @@ func (c *TransacaoController) GetByUserID(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, transacoes)
 }
+
+func (c *TransacaoController) GetRecent(ctx *gin.Context) {
+	limitStr := ctx.Param("qtd")
+	var limit int
+	if _, err := fmt.Sscan(limitStr, &limit); err != nil || limit <= 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
+		return
+	}
+
+	uid, ok := utils.GetUserIDFromContext(ctx)
+	if !ok || uid == 0 {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
+	}
+
+	transacoes, err := c.repo.GetRecentByUsuarioID(limit, uid)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, transacoes)
+}
