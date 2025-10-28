@@ -124,3 +124,14 @@ func (c *TransacaoController) Delete(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusNoContent)
 }
+
+func (c *TransacaoController) GetByTipo(ctx *gin.Context) {
+	tipo := ctx.Param("tipo")
+	transacoes, err := c.repo.GetByTipo(tipo)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, transacoes)
+
+}

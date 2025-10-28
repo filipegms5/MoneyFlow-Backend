@@ -55,3 +55,12 @@ func (r *TransacaoRepository) GetByEstabelecimentoID(estabelecimentoID uint) ([]
 	}
 	return transacoes, nil
 }
+
+func (r *TransacaoRepository) GetByTipo(tipo string) ([]models.Transacao, error) {
+	var transacoes []models.Transacao
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Where("tipo = ?", tipo).Find(&transacoes).Error; err != nil {
+		return nil, err
+	}
+
+	return transacoes, nil
+}
