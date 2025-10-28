@@ -159,7 +159,7 @@ func (c *TransacaoController) GetByPeriodo(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
 		return
 	}
-	transacoes, err := c.repo.GetByPeriodoAndUsuarioID(start, end, uid)
+	transacoes, err := c.repo.GetByPeriodoAndUsuarioIDComRecorrentes(start, end, uid)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

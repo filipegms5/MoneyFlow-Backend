@@ -90,3 +90,12 @@ func (r *TransacaoRepository) GetByPeriodoAndUsuarioID(startISO, endISO string, 
 	}
 	return transacoes, nil
 }
+
+func (r *TransacaoRepository) GetByPeriodoAndUsuarioIDComRecorrentes(startISO, endISO string, usuarioID uint) ([]models.Transacao, error) {
+	var transacoes []models.Transacao
+	if err := r.db.Preload("FormaPagamento").Preload("Estabelecimento").Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).
+		Where("usuario_id = ? AND (data BETWEEN ? AND ? OR recorrente = true)", usuarioID, startISO, endISO).Find(&transacoes).Error; err != nil {
+		return nil, err
+	}
+	return transacoes, nil
+}

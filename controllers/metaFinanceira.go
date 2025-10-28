@@ -141,7 +141,7 @@ func (ctrl *MetaFinanceiraController) GetTransacoesPeriodo(c *gin.Context) {
 		return
 	}
 
-	txs, err := ctrl.transacaoRepo.GetByPeriodoAndUsuarioID(meta.DataInicio, meta.DataFim, uid)
+	txs, err := ctrl.transacaoRepo.GetByPeriodoAndUsuarioIDComRecorrentes(meta.DataInicio, meta.DataFim, uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
