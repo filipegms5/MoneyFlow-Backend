@@ -48,3 +48,16 @@ func (r *MetaFinanceiraRepository) GetByUsuarioID(usuarioID uint) ([]models.Meta
 	}
 	return metas, nil
 }
+
+func (r *MetaFinanceiraRepository) DeactivateAllByUsuarioID(usuarioID uint) error {
+	return r.db.Model(&models.MetaFinanceira{}).Where("usuario_id = ?", usuarioID).Update("ativa", false).Error
+}
+
+func (r *MetaFinanceiraRepository) GetActiveByUsuarioID(usuarioID uint) (*models.MetaFinanceira, error) {
+	var meta models.MetaFinanceira
+	if err := r.db.Preload("Usuario", func(db *gorm.DB) *gorm.DB { return db.Select("id", "email") }).
+		Where("usuario_id = ? AND ativa = true", usuarioID).Order("id DESC").First(&meta).Error; err != nil {
+		return nil, err
+	}
+	return &meta, nil
+}

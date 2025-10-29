@@ -32,10 +32,18 @@ func (ctrl *MetaFinanceiraController) Create(c *gin.Context) {
 	if uid, ok := utils.GetUserIDFromContext(c); ok {
 		m.UsuarioID = uid
 		m.Usuario = nil
+		m.Ativa = true // New meta is always active
 	} else {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
 		return
 	}
+
+	// Deactivate all other metas for this user
+	if err := ctrl.repo.DeactivateAllByUsuarioID(m.UsuarioID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	if err := ctrl.repo.Create(&m); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -116,6 +124,24 @@ func (ctrl *MetaFinanceiraController) GetByUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, metas)
+}
+
+func (ctrl *MetaFinanceiraController) GetActive(c *gin.Context) {
+	uid, ok := utils.GetUserIDFromContext(c)
+	if !ok || uid == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		return
+	}
+	meta, err := ctrl.repo.GetActiveByUsuarioID(uid)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "no active meta found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, meta)
 }
 
 func (ctrl *MetaFinanceiraController) GetTransacoesPeriodo(c *gin.Context) {

@@ -77,6 +77,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		metaRoutes.POST("", metaFinanceiraController.Create)
 		metaRoutes.GET("", metaFinanceiraController.GetAll)
 		metaRoutes.GET("/usuario", metaFinanceiraController.GetByUser)
+		metaRoutes.GET("/ativa", metaFinanceiraController.GetActive)
 		metaRoutes.GET("/:id", metaFinanceiraController.GetByID)
 		metaRoutes.GET("/:id/transacoes", metaFinanceiraController.GetTransacoesPeriodo)
 		metaRoutes.PUT("/:id", metaFinanceiraController.Update)
