@@ -26,7 +26,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		tokenString := parts[1]
 
-		// parse & validate token (try validated parse first)
+		// faz o parse e valida o token (tenta a validação primeiro)
 		token, _ := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, nil
@@ -40,7 +40,7 @@ func AuthMiddleware() gin.HandlerFunc {
 				claims = cks
 			}
 		}
-		// fallback: parse unverified to extract claims (so logout works even for expired tokens)
+		// fallback: faz parse sem verificar para extrair claims (logout funciona mesmo com token expirado)
 		if claims == nil {
 			parser := jwt.Parser{}
 			tokUnverified, _, err := parser.ParseUnverified(tokenString, jwt.MapClaims{})
@@ -53,7 +53,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			}
 		}
 
-		// build jti (use jti claim if present, else fallback to token string key)
+		// constrói o jti (usa a claim jti se existir, senão usa o token como chave)
 		jti := ""
 		if v, ok := claims["jti"]; ok {
 			if s, ok := v.(string); ok {
@@ -64,7 +64,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			jti = "token:" + tokenString
 		}
 
-		// check blacklist
+		// verifica blacklist
 		blacklisted, err := services.IsTokenBlacklisted(jti)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to check token"})
@@ -75,7 +75,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// set useful values in context
+		// define valores úteis no contexto
 		c.Set("jti", jti)
 		if v, ok := claims["user_id"]; ok {
 			c.Set("user_id", v)

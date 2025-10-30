@@ -26,7 +26,7 @@ func Login(email, senha string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// Generate JWT token
+	// Gera o token JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": usuario.ID,
 		"email":   usuario.Email,

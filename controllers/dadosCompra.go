@@ -31,13 +31,13 @@ func NewDadosCompraController(db *gorm.DB) *DadosCompraController {
 func (c *DadosCompraController) FetchDadosCompra(ctx *gin.Context) {
 	var payload RequestPayload
 
-	// Bind the JSON payload to the struct
+	// Faz o bind do JSON para a struct
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Extract the URL variable
+	// Extrai a URL do payload
 	url := payload.URL
 
 	dadosCompra, err := services.FetchTransacao(url)
@@ -46,7 +46,7 @@ func (c *DadosCompraController) FetchDadosCompra(ctx *gin.Context) {
 		return
 	}
 
-	// Save or update Estabelecimento
+	// Salva ou atualiza o Estabelecimento
 	if dadosCompra.Estabelecimento != nil {
 		estabelecimento, err := c.estabelecimentoRepo.GetByCnpj(dadosCompra.Estabelecimento.CNPJ)
 
@@ -66,7 +66,7 @@ func (c *DadosCompraController) FetchDadosCompra(ctx *gin.Context) {
 		dadosCompra.Estabelecimento = nil
 	}
 
-	// Save or update FormaPagamento
+	// Salva ou atualiza a Forma de Pagamento
 	if dadosCompra.FormaPagamento != nil {
 		formaPagamento, err := c.formaPagamentoRepo.GetByNome(dadosCompra.FormaPagamento.Nome)
 
@@ -86,7 +86,7 @@ func (c *DadosCompraController) FetchDadosCompra(ctx *gin.Context) {
 		dadosCompra.FormaPagamento = nil
 	}
 
-	// Attach authenticated user to the transacao
+	// Anexa o usuário autenticado à transação
 	if uid, ok := utils.GetUserIDFromContext(ctx); ok {
 		dadosCompra.UsuarioID = uid
 	} else {

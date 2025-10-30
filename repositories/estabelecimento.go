@@ -27,13 +27,13 @@ func (r *EstabelecimentoRepository) Delete(id uint) error {
 
 func (r *EstabelecimentoRepository) GetAll() ([]models.Estabelecimento, error) {
 	var estabelecimentos []models.Estabelecimento
-	err := r.db.Find(&estabelecimentos).Error
+	err := r.db.Preload("Categoria").Find(&estabelecimentos).Error
 	return estabelecimentos, err
 }
 
 func (r *EstabelecimentoRepository) GetByID(id uint) (*models.Estabelecimento, error) {
 	var estabelecimento models.Estabelecimento
-	err := r.db.First(&estabelecimento, id).Error
+	err := r.db.Preload("Categoria").First(&estabelecimento, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (r *EstabelecimentoRepository) GetByID(id uint) (*models.Estabelecimento, e
 
 func (r *EstabelecimentoRepository) GetByCnpj(cnpj string) (*models.Estabelecimento, error) {
 	var estabelecimento models.Estabelecimento
-	err := r.db.Where("cnpj = ?", cnpj).First(&estabelecimento).Error
+	err := r.db.Preload("Categoria").Where("cnpj = ?", cnpj).First(&estabelecimento).Error
 	if err != nil {
 		return nil, err
 	}

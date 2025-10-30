@@ -6,17 +6,20 @@ import (
 
 	"github.com/filipegms5/MoneyFlow-Backend/models"
 	"github.com/filipegms5/MoneyFlow-Backend/repositories"
+	"github.com/filipegms5/MoneyFlow-Backend/services"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type EstabelecimentoController struct {
 	repo *repositories.EstabelecimentoRepository
+	db   *gorm.DB
 }
 
 func NewEstabelecimentoController(db *gorm.DB) *EstabelecimentoController {
 	return &EstabelecimentoController{
 		repo: repositories.NewEstabelecimentoRepository(db),
+		db:   db,
 	}
 }
 
@@ -25,6 +28,16 @@ func (c *EstabelecimentoController) Create(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&estabelecimento); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Auto-categoria via CNAE
+	if estabelecimento.CategoriaID == 0 && estabelecimento.CNPJ != "" {
+		if cnae, err := services.FetchCNAEFiscalByCNPJ(ctx, estabelecimento.CNPJ); err == nil && cnae != 0 {
+			nome := services.MapCNAEToCategory(cnae)
+			if cat, err := services.EnsureCategoria(c.db, cnae, nome); err == nil {
+				estabelecimento.CategoriaID = cat.ID
+			}
+		}
 	}
 
 	if err := c.repo.Create(&estabelecimento); err != nil {
@@ -49,6 +62,16 @@ func (c *EstabelecimentoController) Update(ctx *gin.Context) {
 		return
 	}
 	estabelecimento.ID = id
+
+	// Auto-categoria via CNAE
+	if estabelecimento.CategoriaID == 0 && estabelecimento.CNPJ != "" {
+		if cnae, err := services.FetchCNAEFiscalByCNPJ(ctx, estabelecimento.CNPJ); err == nil && cnae != 0 {
+			nome := services.MapCNAEToCategory(cnae)
+			if cat, err := services.EnsureCategoria(c.db, cnae, nome); err == nil {
+				estabelecimento.CategoriaID = cat.ID
+			}
+		}
+	}
 
 	if err := c.repo.Update(&estabelecimento); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

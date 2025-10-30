@@ -30,22 +30,22 @@ func FetchTransacao(url string) (models.Transacao, error) {
 	return transacao, err
 }
 
-// Fetches and parses the HTML document
+// Busca e analisa o documento HTML
 func fetch(url string) (*html.Node, error) {
-	// Create a custom HTTP client with TLS configuration to skip SSL verification
+	// Cria um cliente HTTP personalizado com configuração TLS para ignorar verificação SSL
 	customTransport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: customTransport}
 
-	// Send a GET request
+	// Envia uma requisição GET
 	resp, err := client.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// Parse the HTML
+	// Faz o parse do HTML
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
 		return nil, err
@@ -60,19 +60,19 @@ func scrapeAll(n *html.Node) {
 
 		storeName(n)
 
-		// Store address
+		// Armazena endereço
 		storeAdress(n)
 
-		// Date
+		// Data
 		date(n)
 
-		// Products
+		// Produtos
 		//products(n)
 
-		// Sale info
+		// Informações da venda
 		saleInfo(n)
 
-		// Traverse children
+		// Percorre os filhos
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			traverse(c)
 		}
@@ -82,7 +82,7 @@ func scrapeAll(n *html.Node) {
 }
 
 func storeName(n *html.Node) {
-	// Store name
+	// Armazena nome do estabelecimento
 	if n.Type == html.ElementNode && n.Data == "h4" {
 		for b := n.FirstChild; b != nil; b = b.NextSibling {
 			if b.Type == html.ElementNode && b.Data == "b" && b.FirstChild != nil {
@@ -90,7 +90,7 @@ func storeName(n *html.Node) {
 			}
 		}
 	}
-	// Store CNPJ
+	// Armazena CNPJ
 	if n.Type == html.ElementNode && n.Data == "td" {
 		for _, attr := range n.Attr {
 			if attr.Key == "style" && attr.Val == "border-top: 0px;" && n.FirstChild != nil {
@@ -109,14 +109,14 @@ func date(n *html.Node) {
 	if n.Type == html.TextNode {
 		if date := strings.TrimSpace(n.Data); dateRegex.MatchString(date) {
 
-			// Parse the input date string
+			// Faz o parse da data de entrada
 			layoutIn := "02/01/2006 15:04:05"
 			t, err := time.Parse(layoutIn, date)
 			if err != nil {
 				panic(err)
 			}
 
-			// Format to ISO 8601 (UTC with Z)
+			// Formata para ISO 8601 (UTC com Z)
 			layoutOut := "2006-01-02T15:04:05Z"
 			formatted := t.UTC().Format(layoutOut)
 
@@ -127,7 +127,7 @@ func date(n *html.Node) {
 }
 
 func storeAdress(n *html.Node) {
-	// Store address
+	// Armazena endereço
 	if n.Type == html.ElementNode && n.Data == "td" {
 		for _, attr := range n.Attr {
 			if attr.Key == "style" && attr.Val == "border-top: 0px; display: block; font-style: italic;" && n.FirstChild != nil {

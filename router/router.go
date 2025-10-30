@@ -12,6 +12,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 
 	estabelecimentoController := controllers.NewEstabelecimentoController(db)
+	categoriaController := controllers.NewCategoriaController(db)
 	formaPagamentoController := controllers.NewFormaPagamentoController(db)
 	transacaoController := controllers.NewTransacaoController(db)
 	dadosCompraController := controllers.NewDadosCompraController(db)
@@ -35,6 +36,15 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		estabelecimentoRoutes.GET("/:id", estabelecimentoController.GetByID)
 		estabelecimentoRoutes.PUT("/:id", estabelecimentoController.Update)
 		estabelecimentoRoutes.DELETE("/:id", estabelecimentoController.Delete)
+	}
+
+	categoriaRoutes := protected.Group("/categorias")
+	{
+		categoriaRoutes.POST("", categoriaController.Create)
+		categoriaRoutes.GET("", categoriaController.GetAll)
+		categoriaRoutes.GET("/:id", categoriaController.GetByID)
+		categoriaRoutes.PUT("/:id", categoriaController.Update)
+		categoriaRoutes.DELETE("/:id", categoriaController.Delete)
 	}
 
 	formaPagamentoRoutes := protected.Group("/formas-pagamento")
