@@ -68,6 +68,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		transacaoRoutes.GET("/tipo/:tipo", transacaoController.GetByTipo)
 		transacaoRoutes.PUT("/:id", transacaoController.Update)
 		transacaoRoutes.DELETE("/:id", transacaoController.Delete)
+		transacaoRoutes.GET("/gastos-categorias/ultimo-mes", transacaoController.GetGastosPorCategoriaUltimoMes)
 	}
 
 	usuarioRoutes := protected.Group("/usuarios")

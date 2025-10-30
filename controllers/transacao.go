@@ -37,7 +37,7 @@ func (c *TransacaoController) Create(ctx *gin.Context) {
 		return
 	}
 
-	// Accept nested { "forma_pagamento": { "id": 1 } } by copying ID and niling nested object
+	// Aceita objetos aninhados (ex.: { "forma_pagamento": { "id": 1 } }) copiando IDs e anulando objetos
 	if transacao.FormaPagamento != nil && transacao.FormaPagamento.ID != 0 {
 		transacao.FormaPagamentoID = transacao.FormaPagamento.ID
 		transacao.FormaPagamento = nil
@@ -45,6 +45,11 @@ func (c *TransacaoController) Create(ctx *gin.Context) {
 	if transacao.Estabelecimento != nil && transacao.Estabelecimento.ID != 0 {
 		transacao.EstabelecimentoID = transacao.Estabelecimento.ID
 		transacao.Estabelecimento = nil
+	}
+	if transacao.Categoria != nil && transacao.Categoria.ID != 0 {
+		id := transacao.Categoria.ID
+		transacao.CategoriaID = &id
+		transacao.Categoria = nil
 	}
 
 	if err := c.repo.Create(&transacao); err != nil {
@@ -78,6 +83,11 @@ func (c *TransacaoController) Update(ctx *gin.Context) {
 	if transacao.Estabelecimento != nil && transacao.Estabelecimento.ID != 0 {
 		transacao.EstabelecimentoID = transacao.Estabelecimento.ID
 		transacao.Estabelecimento = nil
+	}
+	if transacao.Categoria != nil && transacao.Categoria.ID != 0 {
+		id := transacao.Categoria.ID
+		transacao.CategoriaID = &id
+		transacao.Categoria = nil
 	}
 
 	if err := c.repo.Update(&transacao); err != nil {
@@ -202,4 +212,32 @@ func (c *TransacaoController) GetRecent(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, transacoes)
+}
+
+func (c *TransacaoController) GetGastosPorCategoriaUltimoMes(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(401, gin.H{"error": "Usuário não autenticado"})
+		return
+	}
+	var userID uint
+	switch v := userIDVal.(type) {
+	case float64:
+		userID = uint(v)
+	case int64:
+		userID = uint(v)
+	case uint:
+		userID = v
+	case int:
+		userID = uint(v)
+	default:
+		ctx.JSON(400, gin.H{"error": "user_id inválido"})
+		return
+	}
+	result, err := c.repo.GetGastosPorCategoriaUltimoMes(userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(200, result)
 }

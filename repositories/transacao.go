@@ -1,9 +1,17 @@
 package repositories
 
 import (
+	"time"
+
 	"github.com/filipegms5/MoneyFlow-Backend/models"
 	"gorm.io/gorm"
 )
+
+type CategoriaGasto struct {
+	CategoriaID uint    `json:"categoria_id"`
+	Nome        string  `json:"nome"`
+	Total       float64 `json:"total"`
+}
 
 type TransacaoRepository struct {
 	db *gorm.DB
@@ -107,4 +115,30 @@ func (r *TransacaoRepository) GetRecentByUsuarioID(limit int, usuarioID uint) ([
 		return nil, err
 	}
 	return transacoes, nil
+}
+
+// Agregado: gastos por categoria dos últimos 30 dias, considerando transação.categoria_id ou estabelecimento.categoria_id
+func (r *TransacaoRepository) GetGastosPorCategoriaUltimoMes(usuarioID uint) ([]CategoriaGasto, error) {
+	// janela dos últimos 30 dias (inclui hoje)
+	now := time.Now().UTC()
+	startTime := now.AddDate(0, 0, -30)
+	start := startTime.Format("2006-01-02")
+	end := now.Format("2006-01-02")
+
+	result := make([]CategoriaGasto, 0)
+	query := `
+	SELECT COALESCE(c.id, 9999999) AS categoria_id, COALESCE(c.nome, 'Outros') AS nome, SUM(t.valor) as total
+	FROM transacaos t
+	LEFT JOIN estabelecimentos e ON e.id = t.estabelecimento_id
+	LEFT JOIN categoria c ON c.id = COALESCE(t.categoria_id, e.categoria_id)
+	WHERE t.usuario_id = ? AND t.tipo = 'despesa'
+	AND t.data >= ? AND t.data <= ?
+	GROUP BY COALESCE(c.id, 9999999), COALESCE(c.nome, 'Outros')
+	HAVING total > 0
+	ORDER BY total DESC`
+
+	if err := r.db.Raw(query, usuarioID, start, end).Scan(&result).Error; err != nil {
+		return nil, err
+	}
+	return result, nil
 }
