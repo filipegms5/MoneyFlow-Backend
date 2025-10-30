@@ -51,6 +51,10 @@ func (c *DadosCompraController) FetchDadosCompra(ctx *gin.Context) {
 		estabelecimento, err := c.estabelecimentoRepo.GetByCnpj(dadosCompra.Estabelecimento.CNPJ)
 
 		if estabelecimento == nil {
+			// Se não houver CNPJ, define categoria "Outros" automaticamente
+			if dadosCompra.Estabelecimento.CNPJ == "" && dadosCompra.Estabelecimento.CategoriaID == 0 {
+				dadosCompra.Estabelecimento.CategoriaID = 9999999
+			}
 			err = c.estabelecimentoRepo.Create(dadosCompra.Estabelecimento)
 		}
 		if err != nil {

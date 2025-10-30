@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"strings"
+
 	"github.com/filipegms5/MoneyFlow-Backend/models"
 	"gorm.io/gorm"
 )
@@ -19,7 +21,10 @@ func BackfillCategoriasMissing(db *gorm.DB) {
 	}
 
 	for _, est := range estabelecimentos {
-		if est.CNPJ == "" {
+		if strings.TrimSpace(est.CNPJ) == "" {
+			if cat, err := EnsureCategoria(db, int(9999999), "Outros"); err == nil {
+				_ = db.Model(&models.Estabelecimento{}).Where("id = ?", est.ID).Update("categoria_id", cat.ID).Error
+			}
 			continue
 		}
 		cnae, err := FetchCNAEFiscalByCNPJ(ctx, est.CNPJ)
@@ -31,10 +36,9 @@ func BackfillCategoriasMissing(db *gorm.DB) {
 		if err != nil {
 			continue
 		}
-		// update estabelecimento
+		// atualiza estabelecimento
 		_ = db.Model(&models.Estabelecimento{}).Where("id = ?", est.ID).Update("categoria_id", cat.ID).Error
 		// pequenas pausas para evitar rate limit
 		time.Sleep(100 * time.Millisecond)
 	}
 }
-

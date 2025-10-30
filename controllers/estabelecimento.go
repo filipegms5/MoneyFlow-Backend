@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"strings"
+
 	"github.com/filipegms5/MoneyFlow-Backend/models"
 	"github.com/filipegms5/MoneyFlow-Backend/repositories"
 	"github.com/filipegms5/MoneyFlow-Backend/services"
@@ -30,12 +32,18 @@ func (c *EstabelecimentoController) Create(ctx *gin.Context) {
 		return
 	}
 
-	// Auto-categoria via CNAE
-	if estabelecimento.CategoriaID == 0 && estabelecimento.CNPJ != "" {
-		if cnae, err := services.FetchCNAEFiscalByCNPJ(ctx, estabelecimento.CNPJ); err == nil && cnae != 0 {
-			nome := services.MapCNAEToCategory(cnae)
-			if cat, err := services.EnsureCategoria(c.db, cnae, nome); err == nil {
+	// Auto-categoria: se não houver CNPJ, usar "Outros"; senão, tentar via CNAE
+	if estabelecimento.CategoriaID == 0 {
+		if strings.TrimSpace(estabelecimento.CNPJ) == "" {
+			if cat, err := services.EnsureCategoria(c.db, int(9999999), "Outros"); err == nil {
 				estabelecimento.CategoriaID = cat.ID
+			}
+		} else {
+			if cnae, err := services.FetchCNAEFiscalByCNPJ(ctx, estabelecimento.CNPJ); err == nil && cnae != 0 {
+				nome := services.MapCNAEToCategory(cnae)
+				if cat, err := services.EnsureCategoria(c.db, cnae, nome); err == nil {
+					estabelecimento.CategoriaID = cat.ID
+				}
 			}
 		}
 	}
@@ -63,12 +71,18 @@ func (c *EstabelecimentoController) Update(ctx *gin.Context) {
 	}
 	estabelecimento.ID = id
 
-	// Auto-categoria via CNAE
-	if estabelecimento.CategoriaID == 0 && estabelecimento.CNPJ != "" {
-		if cnae, err := services.FetchCNAEFiscalByCNPJ(ctx, estabelecimento.CNPJ); err == nil && cnae != 0 {
-			nome := services.MapCNAEToCategory(cnae)
-			if cat, err := services.EnsureCategoria(c.db, cnae, nome); err == nil {
+	// Auto-categoria: se não houver CNPJ, usar "Outros"; senão, tentar via CNAE
+	if estabelecimento.CategoriaID == 0 {
+		if strings.TrimSpace(estabelecimento.CNPJ) == "" {
+			if cat, err := services.EnsureCategoria(c.db, int(9999999), "Outros"); err == nil {
 				estabelecimento.CategoriaID = cat.ID
+			}
+		} else {
+			if cnae, err := services.FetchCNAEFiscalByCNPJ(ctx, estabelecimento.CNPJ); err == nil && cnae != 0 {
+				nome := services.MapCNAEToCategory(cnae)
+				if cat, err := services.EnsureCategoria(c.db, cnae, nome); err == nil {
+					estabelecimento.CategoriaID = cat.ID
+				}
 			}
 		}
 	}

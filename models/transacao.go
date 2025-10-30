@@ -13,4 +13,6 @@ type Transacao struct {
 	Estabelecimento   *Estabelecimento `gorm:"foreignKey:EstabelecimentoID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"estabelecimento,omitempty"`
 	UsuarioID         uint             `gorm:"column:usuario_id" json:"-"`
 	Usuario           *Usuario         `gorm:"foreignKey:UsuarioID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"usuario,omitempty"`
+	CategoriaID       *uint            `gorm:"column:categoria_id" json:"-"`
+	Categoria         *Categoria       `json:"categoria,omitempty"`
 }
