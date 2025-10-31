@@ -74,6 +74,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	usuarioRoutes := protected.Group("/usuarios")
 	{
 		usuarioRoutes.GET("/usuario", usuarioController.GetUserID)
+		usuarioRoutes.POST("/logout", usuarioController.Logout)
 		usuarioRoutes.PUT("/:id", usuarioController.Update)
 		usuarioRoutes.DELETE("/:id", usuarioController.Delete)
 	}
