@@ -217,7 +217,7 @@ func (c *TransacaoController) GetRecent(ctx *gin.Context) {
 func (c *TransacaoController) GetGastosPorCategoriaUltimoMes(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("user_id")
 	if !exists {
-		ctx.JSON(401, gin.H{"error": "Usuário não autenticado"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Usuário não autenticado"})
 		return
 	}
 	var userID uint
@@ -231,13 +231,13 @@ func (c *TransacaoController) GetGastosPorCategoriaUltimoMes(ctx *gin.Context) {
 	case int:
 		userID = uint(v)
 	default:
-		ctx.JSON(400, gin.H{"error": "user_id inválido"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "user_id inválido"})
 		return
 	}
 	result, err := c.repo.GetGastosPorCategoriaUltimoMes(userID)
 	if err != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(200, result)
+	ctx.JSON(http.StatusOK, result)
 }
