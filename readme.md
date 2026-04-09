@@ -205,55 +205,55 @@ ROTAS DISPONÍVEIS
 
 ROTAS PÚBLICAS (sem autenticação):
 -----------------------------------
-POST   /login                    - Login de usuário
-POST   /signup                   - Registro de novo usuário
+ - POST   /login                    - Login de usuário
+ - POST   /signup                   - Registro de novo usuário
 
 
 ROTAS PROTEGIDAS (requer token JWT):
 -----------------------------------
-POST   /usuarios/logout          - Logout do usuário
-GET    /usuarios/usuario         - Obter ID do usuário logado
+ - POST   /usuarios/logout          - Logout do usuário
+ - GET    /usuarios/usuario         - Obter ID do usuário logado
 
-POST   /transacoes               - Criar transação
-GET    /transacoes               - Listar todas as transações
-GET    /transacoes/:id           - Obter transação por ID
-GET    /transacoes/usuario       - Transações do usuário logado
-GET    /transacoes/qtd/:qtd      - Últimas N transações
-GET    /transacoes/periodo       - Transações por período
-GET    /transacoes/tipo/:tipo    - Transações por tipo
-GET    /transacoes/gastos-categorias/ultimo-mes - Gastos por categoria (últimos 30 dias)
-PUT    /transacoes/:id           - Atualizar transação
-DELETE /transacoes/:id           - Deletar transação
+ - POST   /transacoes               - Criar transação
+ - GET    /transacoes               - Listar todas as transações
+ - GET    /transacoes/:id           - Obter transação por ID
+ - GET    /transacoes/usuario       - Transações do usuário logado
+ - GET    /transacoes/qtd/:qtd      - Últimas N transações
+ - GET    /transacoes/periodo       - Transações por período
+ - GET    /transacoes/tipo/:tipo    - Transações por tipo
+ - GET    /transacoes/gastos-categorias/ultimo-mes - Gastos por categoria (últimos 30 dias)
+ - PUT    /transacoes/:id           - Atualizar transação
+ - DELETE /transacoes/:id           - Deletar transação
 
-POST   /categorias               - Criar categoria
-GET    /categorias               - Listar todas as categorias
-GET    /categorias/:id           - Obter categoria por ID
-PUT    /categorias/:id           - Atualizar categoria
-DELETE /categorias/:id           - Deletar categoria
+ - POST   /categorias               - Criar categoria
+ - GET    /categorias               - Listar todas as categorias
+ - GET    /categorias/:id           - Obter categoria por ID
+ - PUT    /categorias/:id           - Atualizar categoria
+ - DELETE /categorias/:id           - Deletar categoria
 
-POST   /estabelecimentos         - Criar estabelecimento
-GET    /estabelecimentos         - Listar todos os estabelecimentos
-GET    /estabelecimentos/:id     - Obter estabelecimento por ID
-PUT    /estabelecimentos/:id     - Atualizar estabelecimento
-DELETE /estabelecimentos/:id     - Deletar estabelecimento
+ - POST   /estabelecimentos         - Criar estabelecimento
+ - GET    /estabelecimentos         - Listar todos os estabelecimentos
+ - GET    /estabelecimentos/:id     - Obter estabelecimento por ID
+ - PUT    /estabelecimentos/:id     - Atualizar estabelecimento
+ - DELETE /estabelecimentos/:id     - Deletar estabelecimento
 
-POST   /formas-pagamento         - Criar forma de pagamento
-GET    /formas-pagamento         - Listar todas as formas de pagamento
-GET    /formas-pagamento/:id     - Obter forma de pagamento por ID
-GET    /formas-pagamento/qtd/:qtd - Primeiras N formas de pagamento
-PUT    /formas-pagamento/:id     - Atualizar forma de pagamento
-DELETE /formas-pagamento/:id     - Deletar forma de pagamento
+ - POST   /formas-pagamento         - Criar forma de pagamento
+ - GET    /formas-pagamento         - Listar todas as formas de pagamento
+ - GET    /formas-pagamento/:id     - Obter forma de pagamento por ID
+ - GET    /formas-pagamento/qtd/:qtd - Primeiras N formas de pagamento
+ - PUT    /formas-pagamento/:id     - Atualizar forma de pagamento
+ - DELETE /formas-pagamento/:id     - Deletar forma de pagamento
 
-POST   /metas-financeiras        - Criar meta financeira
-GET    /metas-financeiras        - Listar todas as metas
-GET    /metas-financeiras/usuario - Metas do usuário logado
-GET    /metas-financeiras/ativa  - Meta financeira ativa
-GET    /metas-financeiras/:id    - Obter meta por ID
-GET    /metas-financeiras/:id/transacoes - Transações de uma meta
-PUT    /metas-financeiras/:id    - Atualizar meta
-DELETE /metas-financeiras/:id    - Deletar meta
+ - POST   /metas-financeiras        - Criar meta financeira
+ - GET    /metas-financeiras        - Listar todas as metas
+ - GET    /metas-financeiras/usuario - Metas do usuário logado
+ - GET    /metas-financeiras/ativa  - Meta financeira ativa
+ - GET    /metas-financeiras/:id    - Obter meta por ID
+ - GET    /metas-financeiras/:id/transacoes - Transações de uma meta
+ - PUT    /metas-financeiras/:id    - Atualizar meta
+ - DELETE /metas-financeiras/:id    - Deletar meta
 
-POST   /scan                     - Extrair dados de compra via URL
+ - POST   /scan                     - Extrair dados de compra via URL
 
 
 AUTENTICAÇÃO
