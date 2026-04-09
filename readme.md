@@ -1,6 +1,6 @@
-================================================================================
-                    GUIA PASSO A PASSO - MONEY FLOW BACKEND
-                  Como rodar o backend da aplicação
+
+GUIA PASSO A PASSO - MONEY FLOW BACKEND -
+Como rodar o backend da aplicação
 ================================================================================
 
 PRÉ-REQUISITOS
