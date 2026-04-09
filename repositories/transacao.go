@@ -117,9 +117,9 @@ func (r *TransacaoRepository) GetRecentByUsuarioID(limit int, usuarioID uint) ([
 	return transacoes, nil
 }
 
-// Agregado: gastos por categoria dos últimos 30 dias, considerando transação.categoria_id ou estabelecimento.categoria_id
+// Agregado: gastos por categoria dos últimos 30 dias incluindo hoje, considerando transação.categoria_id ou estabelecimento.categoria_id
 func (r *TransacaoRepository) GetGastosPorCategoriaUltimoMes(usuarioID uint) ([]CategoriaGasto, error) {
-	// janela dos últimos 30 dias (inclui hoje)
+	// janela dos últimos 30 dias até hoje (inclusive)
 	now := time.Now().UTC()
 	startTime := now.AddDate(0, 0, -30)
 	start := startTime.Format("2006-01-02")
